@@ -8,12 +8,14 @@ repo: treeprep-status # name of this repository
 # generated workflows and is not listed. This is the complete allowlist: if you add notifications later,
 # add their NOTIFICATION_* secrets here too.
 secrets:
-  - TREEPREP_SITE_URL # the website, e.g. https://treeprep.com/
-  - TREEPREP_HEALTH_URL # the API health endpoint, e.g. https://treeprep.com/api/health
+  - TREEPREP_HOST # bare hostname of the monitored site, no scheme or path, e.g. treeprep.com
 
-# The URLs live in secrets so that moving from staging to production is a secret change only.
-# Body rules look for plain text in the response (headers included). Upptime marks a check "down" or "degraded"
-# when the text is missing, and retries twice (after 2 s and 10 s) before it records that.
+# Only the hostname lives in a secret, so moving from staging to production is a secret change only. GitHub masks
+# a secret's exact value in workflow logs, and when a check fails to connect curl prints just the host, so a
+# host-only secret is what gets masked. (A full-URL secret would not match that error text.)
+# Body rules look for text in the response (headers included) and mark a check "down" or "degraded" when it is
+# missing (or, for `body_degraded`, present). A check that is not up is retried twice (after 2 s and 10 s) before
+# it is recorded.
 #
 # The three health checks read the same endpoint. `sandbox.ready` and `ai` in its answer report whether the
 # code runner URL and the AI key are configured; they do not call the runner or the AI provider, so these two
@@ -21,16 +23,16 @@ secrets:
 sites:
   - name: Website
     slug: website
-    url: $TREEPREP_SITE_URL
+    url: https://$TREEPREP_HOST/
     icon: https://status.treeprep.com/treeprep-icon-small.svg
     maxResponseTime: 5000 # ms; slower than this counts as degraded
     # The site is a single-page app: Firebase answers unknown paths with the same index.html and a 200, so a
-    # status code alone proves little. This element exists only in the real app shell.
-    __dangerous__body_down_if_text_missing: '<div id="root"></div>'
+    # status code alone proves little. This id exists only in the real app shell.
+    __dangerous__body_down_if_text_missing: 'id="root"'
 
   - name: API
     slug: api
-    url: $TREEPREP_HEALTH_URL
+    url: https://$TREEPREP_HOST/api/health
     icon: https://status.treeprep.com/treeprep-icon-small.svg
     expectedStatusCodes:
       - 200
@@ -40,23 +42,27 @@ sites:
 
   - name: Code runner
     slug: code-runner
-    url: $TREEPREP_HEALTH_URL
+    url: https://$TREEPREP_HOST/api/health
     icon: https://status.treeprep.com/treeprep-icon-small.svg
     expectedStatusCodes:
       - 200
     maxResponseTime: 8000
     # Without a runner, Run and Submit fail for everyone, so a missing "ready":true is "down", not "degraded".
-    __dangerous__body_down_if_text_missing: '"ready":true'
+    # The pattern ties "ready":true to the "sandbox" object, so another "ready" key elsewhere cannot keep it green.
+    # It is a JavaScript regular expression without flags (single-quoted YAML keeps the backslash as is).
+    __dangerous__body_down_if_regex_missing: '"sandbox":\{[^}]*"ready":true'
 
   - name: AI feedback
     slug: ai-feedback
-    url: $TREEPREP_HEALTH_URL
+    url: https://$TREEPREP_HOST/api/health
     icon: https://status.treeprep.com/treeprep-icon-small.svg
     expectedStatusCodes:
       - 200
     maxResponseTime: 8000
-    # Practice still works without AI feedback, so a missing "ai":true is "degraded", not "down".
-    __dangerous__body_degraded_if_text_missing: '"ai":true'
+    # Practice still works without AI feedback, so this is "degraded", not "down". The API answers "ai":false when
+    # the key is not set. This presence rule only applies when the HTTP status was expected, so a full outage
+    # (unreachable or 5xx) stays "down" instead of being masked as "degraded".
+    __dangerous__body_degraded: '"ai":false'
 
 status-website:
   cname: status.treeprep.com
@@ -66,10 +72,10 @@ status-website:
   favicon: /icon-192.png
   faviconSvg: /treeprep-icon-small.svg
   themeUrl: /treeprep.css # colours and fonts, see the comments in that file
-  # NOTE: this page monitors STAGING for now (the URLs in the secrets above). Before switching the secrets to
-  # production (docs/SETUP.md, "Moving to production") remove the noindex tag below and update this text.
+  # NOTE: this page monitors STAGING for now (the host in the TREEPREP_HOST secret). Before switching the secrets to
+  # production (docs/SETUP.md, "Moving to production") remove the noindex tag below and the staging sentence in introMessage.
   introTitle: Live status of TreePrep.
-  introMessage: We check the website, the API, the code runner and AI feedback around the clock. If something breaks, it is listed here as an incident until it is fixed.
+  introMessage: We check the website, the API, the code runner and AI feedback around the clock. This page currently monitors TreePrep's staging environment. If something breaks, it is listed here as an incident until it is fixed.
   metaTags:
     - name: robots
       content: noindex
