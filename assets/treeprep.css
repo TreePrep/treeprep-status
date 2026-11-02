@@ -168,12 +168,14 @@ nav .logo > div::after {
 }
 
 nav .logo > div::before {
-  content: "Tree";
+  content: "Tree"; /* fallback for browsers without alt text in content */
+  content: "Tree" / ""; /* empty alt text: screen readers read the real text instead */
   color: var(--ink);
 }
 
 nav .logo > div::after {
-  content: "Prep";
+  content: "Prep"; /* fallback */
+  content: "Prep" / "";
   color: var(--pen-deep);
 }
 
@@ -257,6 +259,26 @@ html .f.r label {
   color: var(--ink-3);
   font-weight: 600;
   font-stretch: 110%;
+}
+
+/* Upstream hides the radios with display: none (a scoped rule, hence !important), which takes them out of the
+   keyboard order. Keep them focusable but invisible, and show the focus on the label next to them. */
+html .f.r > div {
+  position: relative;
+}
+
+html .f.r input[type="radio"] {
+  display: block !important;
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+html .f.r input:focus-visible + label {
+  outline: 2px solid var(--ballpoint);
+  outline-offset: 3px;
 }
 
 html .f.r input:checked + label {
