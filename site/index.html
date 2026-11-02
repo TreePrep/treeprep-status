@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TreePrep Status</title>
+    <meta name="description" content="Live status of TreePrep: website, API, code runner and AI feedback." />
+    <meta name="color-scheme" content="light dark" />
+    <!-- This page currently monitors a staging environment. Remove the robots tag below when the checks point at production. -->
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/treeprep-icon-small.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="preload" href="/fonts/anybody-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="page" id="main">
+      <header class="brand">
+        <a class="brand__link" href="https://treeprep.com">
+          <img class="brand__mark" src="/treeprep-icon.svg" alt="" width="36" height="36" />
+          <h1 class="brand__name">Tree<span>Prep</span><span class="sr-only"> status</span></h1>
+        </a>
+      </header>
+
+      <section id="banner" class="banner banner--loading" role="status" aria-live="polite">
+        <span class="banner__text">Checking status…</span>
+      </section>
+
+      <section class="block" aria-labelledby="components-h">
+        <h2 class="block__h" id="components-h">Components</h2>
+        <div id="components" class="panel" aria-busy="true"></div>
+      </section>
+
+      <section class="block" aria-labelledby="incidents-h">
+        <h2 class="block__h" id="incidents-h">Past incidents</h2>
+        <div id="incidents" aria-busy="true"></div>
+      </section>
+
+      <noscript><p class="note">This page needs JavaScript to show the live status.</p></noscript>
+    </main>
+
+    <footer class="foot">
+      <a href="https://upptime.js.org" rel="noopener">Powered by Upptime</a>
+    </footer>
+
+    <div id="tip" class="tip" role="presentation" hidden></div>
+    <div id="live" class="sr-only" role="status" aria-live="polite"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
