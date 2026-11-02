@@ -1,0 +1,85 @@
+# Rewrites Upptime's incident issues so they read well on the public status page:
+#   - the title loses its leading emoji ("Website is down"),
+#   - the body becomes a plain "we are aware" message (Upptime's original text stays in an HTML comment),
+#   - Upptime's own "Resolved" comment becomes "Resolved: <Name> is back up after <time>." (no commit link).
+# This file is not one of the eight workflows Upptime regenerates, so its template update leaves it alone.
+# Upptime locks these issues; the token has write access, which still allows editing them.
+# The logic lives in .github/scripts/incident-message.js. Every rewrite is idempotent.
+name: Incident message
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+  workflow_dispatch: # one-off clean-up of every existing incident issue
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: incident-message-${{ github.event.issue.number || 'all' }}
+  cancel-in-progress: false
+
+jobs:
+  issue:
+    name: Rewrite incident issue
+    if: ${{ github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'status') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/scripts
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const { rewriteIssue } = require("./.github/scripts/incident-message.js");
+            const { owner, repo } = context.repo;
+            const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number: context.issue.number });
+            await rewriteIssue({ github, core, owner, repo, issue });
+
+  resolved-comment:
+    name: Rewrite resolved comment
+    if: >-
+      ${{ github.event_name == 'issue_comment'
+      && !github.event.issue.pull_request
+      && contains(github.event.issue.labels.*.name, 'status')
+      && github.event.comment.user.login == github.event.issue.user.login
+      && startsWith(github.event.comment.body, '**Resolved:**') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/scripts
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const { rewriteComment } = require("./.github/scripts/incident-message.js");
+            const { owner, repo } = context.repo;
+            await rewriteComment({ github, core, owner, repo, issue: context.payload.issue, comment: context.payload.comment });
+
+  backfill:
+    name: Rewrite all existing incident issues
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/scripts
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const { rewriteIssue, rewriteComment } = require("./.github/scripts/incident-message.js");
+            const { owner, repo } = context.repo;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, labels: "status", state: "all", per_page: 100,
+            });
+            for (const issue of issues.filter((i) => !i.pull_request)) {
+              await rewriteIssue({ github, core, owner, repo, issue });
+              if (!issue.comments) continue;
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner, repo, issue_number: issue.number, per_page: 100,
+              });
+              for (const comment of comments) await rewriteComment({ github, core, owner, repo, issue, comment });
+            }
