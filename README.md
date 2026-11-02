@@ -17,3 +17,4 @@ Uptime monitor and status page for [TreePrep](https://treeprep.com), built with 
 - Code: [MIT](./LICENSE)
 - Data in the `./history` directory: [Open Database License](./history/LICENSE)
 - Fonts in `./assets/fonts`: SIL Open Font License 1.1 (see the license files next to them)
+- The TreePrep name, icon and wordmark (in `./assets`) are not covered by the MIT license; all rights reserved.
