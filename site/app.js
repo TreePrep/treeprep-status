@@ -539,7 +539,7 @@
       );
     });
 
-    return h("article", { class: "inc" + (inc.degraded ? " inc--warn" : ""), "aria-labelledby": titleId },
+    return h("article", { class: "inc" + (inc.degraded ? " inc--warn" : "") + (inc.status === "Resolved" ? " inc--resolved" : ""), "aria-labelledby": titleId },
       h("h4", { class: "inc__title", id: titleId }, inc.title),
       h("div", { class: "inc__meta" },
         h("span", { class: "chip " + chipCls }, inc.status),
