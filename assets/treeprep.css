@@ -267,6 +267,10 @@ html .f.r > div {
   position: relative;
 }
 
+html .f.r {
+  position: relative; /* keeps the hidden radios inside the switch, so focusing one does not scroll the page */
+}
+
 html .f.r input[type="radio"] {
   display: block !important;
   position: absolute;
