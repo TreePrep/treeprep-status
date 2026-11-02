@@ -67,11 +67,13 @@ sites:
 status-website:
   cname: status.treeprep.com
   name: TreePrep Status # browser tab title; the header shows the TreePrep wordmark (assets/treeprep.css)
-  logoUrl: /treeprep-icon.svg
+  # Full URLs on purpose: the site build crawls same-site links before assets/ is copied in, and a crawled
+  # missing path is saved as a folder that then blocks the copy (cp EISDIR). Other hosts are not crawled.
+  logoUrl: https://status.treeprep.com/treeprep-icon.svg
   logoHref: https://treeprep.com
-  favicon: /icon-192.png
-  faviconSvg: /treeprep-icon-small.svg
-  themeUrl: /treeprep.css # colours and fonts, see the comments in that file
+  favicon: https://status.treeprep.com/icon-192.png
+  faviconSvg: https://status.treeprep.com/treeprep-icon-small.svg
+  themeUrl: https://status.treeprep.com/treeprep.css # colours and fonts, see the comments in that file
   # NOTE: this page monitors STAGING for now (the host in the TREEPREP_HOST secret). Before switching the secrets to
   # production, remove the noindex tag below and the staging sentence in introMessage.
   introTitle: Live status of TreePrep.
