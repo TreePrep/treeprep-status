@@ -1,0 +1,39 @@
+# Deploys the status page (site/) to GitHub Pages. This file is ours: Upptime's template update leaves it alone.
+# Needs Settings > Pages > Source = "GitHub Actions" (see README). The page reads its data in the browser, so it only
+# has to be redeployed when site/ itself changes, not when Upptime commits new results.
+name: Deploy status page
+on:
+  push:
+    branches: [master]
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Stage the site
+        # mock.js holds local development fixtures and must not be published
+        run: |
+          mkdir _site
+          cp -R site/. _site/
+          rm -f _site/mock.js
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v5

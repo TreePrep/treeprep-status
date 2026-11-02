@@ -64,25 +64,10 @@ sites:
     # (unreachable or 5xx) stays "down" instead of being masked as "degraded".
     __dangerous__body_degraded: '"ai":false'
 
+# The public page is our own static site in site/, deployed by .github/workflows/pages.yml (see README). Upptime's
+# own Svelte site build is switched off, so Static Site CI has nothing to build (see the README on disabling it).
+# `cname` is still read by Upptime for the links it writes (README summary, repository homepage).
+skipGeneratingWebsite: true
+
 status-website:
   cname: status.treeprep.com
-  name: TreePrep Status # browser tab title; the header shows the TreePrep wordmark (assets/treeprep.css)
-  # Full URLs on purpose: the site build crawls same-site links before assets/ is copied in, and a crawled
-  # missing path is saved as a folder that then blocks the copy (cp EISDIR). Other hosts are not crawled.
-  logoUrl: https://status.treeprep.com/treeprep-icon.svg
-  logoHref: https://treeprep.com
-  favicon: https://status.treeprep.com/icon-192.png
-  faviconSvg: https://status.treeprep.com/treeprep-icon-small.svg
-  themeUrl: https://status.treeprep.com/treeprep.css # colours and fonts, see the comments in that file
-  # NOTE: this page monitors STAGING for now (the host in the TREEPREP_HOST secret). Before switching the secrets to
-  # production, remove the noindex tag below and the staging sentence in introMessage.
-  introTitle: Live status of TreePrep.
-  introMessage: We check the website, the API, the code runner and AI feedback around the clock. This page currently monitors TreePrep's staging environment. If something breaks, it is listed here as an incident until it is fixed.
-  metaTags:
-    - name: robots
-      content: noindex
-  navbar:
-    - title: Status
-      href: /
-    - title: TreePrep
-      href: https://treeprep.com
