@@ -9,7 +9,7 @@
  *                           one list request, plus one comments request per recent incident that has comments.
  *                           Everything from the API is cached in sessionStorage.
  *
- * Site URLs in summary.json are placeholders ($TREEPREP_HOST) and are never read or shown.
+ * Site URLs in summary.json are placeholders ($TREEPREP_HOST, $TREEPREP_API_HOST) and are never read or shown.
  */
 (function () {
   "use strict";

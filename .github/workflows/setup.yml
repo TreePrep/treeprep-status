@@ -61,7 +61,7 @@ jobs:
         env:
           GH_PAT: ${{ steps.app_token.outputs.token || secrets.GH_PAT || github.token }}
           # Configure the secret allowlist in .upptimerc.yml; do not edit this workflow directly.
-          SECRETS_CONTEXT: '{"TREEPREP_HOST":${{ toJson(secrets.TREEPREP_HOST) }}}'
+          SECRETS_CONTEXT: '{"TREEPREP_HOST":${{ toJson(secrets.TREEPREP_HOST) }},"TREEPREP_API_HOST":${{ toJson(secrets.TREEPREP_API_HOST) }}}'
       - name: Update summary in README
         uses: upptime/uptime-monitor@v1.46.5
         with:

@@ -8,9 +8,10 @@ repo: treeprep-status # name of this repository
 # generated workflows and is not listed. This is the complete allowlist: if you add notifications later,
 # add their NOTIFICATION_* secrets here too.
 secrets:
-  - TREEPREP_HOST # bare hostname of the monitored site, no scheme or path, e.g. treeprep.com
+  - TREEPREP_HOST # bare hostname of the website, no scheme or path, e.g. treeprep.com
+  - TREEPREP_API_HOST # bare hostname of the API, no scheme or path, e.g. api.treeprep.com
 
-# Only the hostname lives in a secret, so moving from staging to production is a secret change only. GitHub masks
+# Only the hostnames live in secrets, so moving from staging to production is a secret change only. GitHub masks
 # a secret's exact value in workflow logs, and when a check fails to connect curl prints just the host, so a
 # host-only secret is what gets masked. (A full-URL secret would not match that error text.)
 # Body rules look for text in the response (headers included) and mark a check "down" or "degraded" when it is
@@ -32,7 +33,7 @@ sites:
 
   - name: API
     slug: api
-    url: https://$TREEPREP_HOST/api/health
+    url: https://$TREEPREP_API_HOST/api/health
     icon: https://status.treeprep.com/treeprep-icon-small.svg
     expectedStatusCodes:
       - 200
@@ -42,7 +43,7 @@ sites:
 
   - name: Code runner
     slug: code-runner
-    url: https://$TREEPREP_HOST/api/health
+    url: https://$TREEPREP_API_HOST/api/health
     icon: https://status.treeprep.com/treeprep-icon-small.svg
     expectedStatusCodes:
       - 200
@@ -54,7 +55,7 @@ sites:
 
   - name: AI feedback
     slug: ai-feedback
-    url: https://$TREEPREP_HOST/api/health
+    url: https://$TREEPREP_API_HOST/api/health
     icon: https://status.treeprep.com/treeprep-icon-small.svg
     expectedStatusCodes:
       - 200
