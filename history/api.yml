@@ -1,7 +1,7 @@
 url: https://$TREEPREP_API_HOST/api/health
 status: up
 code: 200
-responseTime: 715
-lastUpdated: 2026-11-16T02:30:05.733Z
+responseTime: 186
+lastUpdated: 2026-11-17T04:53:49.350Z
 startTime: 2026-11-02T16:11:51.914Z
 generator: Upptime <https://github.com/upptime/upptime>
